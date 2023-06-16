@@ -43,7 +43,8 @@
                         "description": "Telefono del usuario"
                     }
                 }
-            },
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
