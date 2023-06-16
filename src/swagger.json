@@ -1,0 +1,196 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API REST Delivery Restaurant",
+        "version": "1.0.0"
+    },
+    "components": {
+        "schemas": {
+            "LoginData": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "description": "Email del usuario"
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Contraseña del usuario"
+                    }
+                }
+            },
+            "Registers": {
+                "type": "object",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre del usuario"
+                    },
+                    "apellido": {
+                        "type": "string",
+                        "description": "Apellido del usuario"
+                    },
+                    "email": {
+                        "type": "string",
+                        "description": "Email del usuario"
+                    },
+                    "password": {
+                        "type": "string",
+                        "description": "Contraseña del usuario"
+                    },
+                    "telefono": {
+                        "type": "number",
+                        "description": "Telefono del usuario"
+                    }
+                }
+            },
+            "Create Service": {
+                "type": "object",
+                "properties": {
+                    "nombre": {
+                        "type": "string",
+                        "description": "Nombre del servicio"
+                    },
+                    "descripcion": {
+                        "type": "string",
+                        "description": "Descripcion del servicio"
+                    },
+                    "precio": {
+                        "type": "number",
+                        "description": "Precio del servicio"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    },
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ],
+    "paths": {
+        "/v1/auth/register": {
+            "post": {
+                "description": "Crear un usuario",
+                "tags": [
+                    "v1",
+                    "Register"
+                ],
+                "requestBody": {
+                    "description": "Insertar datos del usuario",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Registers"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario creado exitosamente"
+                    },
+                    "400": {
+                        "description": "Error intentando crear nuevo usuario"
+                    }
+                }
+            }
+        },
+        "/v1/auth/login": {
+            "post": {
+                "description": "Iniciar sesion",
+                "tags": [
+                    "Auth",
+                    "v1"
+                ],
+                "requestBody": {
+                    "description": "Solicitud de Inicio de sesion",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoginData"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inicio de sesion exitoso"
+                    },
+                    "401": {
+                        "description": "Credenciales Invalidas"
+                    }
+                }
+            }
+        },
+        "/v1/users/": {
+            "get": {
+                "description": "Obtener todos los usuarios",
+                "tags": [
+                    "Users",
+                    "v1"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Obtenemos exitosamente todos los usuarios"
+                    },
+                    "400": {
+                        "description": "Generamos un error en caso de que la peticion no se resuelva"
+                    }
+                }
+            }
+        },
+        "/v1/users/me": {
+            "get": {
+                "description": "Obtener el usuario loggeado",
+                "tags": [
+                    "Users",
+                    "v1"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Obtenemos exitosamente el usuario loggeado"
+                    },
+                    "400": {
+                        "description": "Generamos un error en caso de que la peticion no se resuelva"
+                    }
+                }
+            }
+        },
+        "/v1/users/{id}": {
+            "get": {
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id del usuario",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "description": "Obtenemos un usuario en especifico",
+                "tags": [
+                    "Users",
+                    "v1"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Obtenemos exitosamente el usuario"
+                    },
+                    "400": {
+                        "description": "Generamos un error en caso de que la peticion no se resuelva"
+                    }
+                }
+            }
+        }
+    }
+}
