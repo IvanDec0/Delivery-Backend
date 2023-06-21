@@ -1,4 +1,4 @@
-const {getUserById} = require("../users/user.controller");
+const {getUserById} = require("../users/user.service");
 const { ExtractJwt, Strategy } = require('passport-jwt')
 const passport = require('passport')
 

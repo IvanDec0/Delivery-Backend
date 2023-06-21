@@ -10,6 +10,8 @@ const path = require('path');
 //*archivos de rutas
 const userRoute = require('./users/user.routes').router
 const authRoute = require('./auth/auth.routes').router
+const categoryRoute = require('./categories/categories.routes').router
+const productRoute = require('./products/products.routes').router
 const swaggerDoc = require('./swagger.json')
 
 //*Conexion BD
@@ -42,6 +44,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/v1/users', userRoute);
+app.use('/v1/categories', categoryRoute);
+app.use('/v1/products', productRoute);
 app.use('/v1/auth', authRoute);
 
 app.use('/v1/doc', swaggerUi.serve, swaggerUi.setup(swaggerDoc))

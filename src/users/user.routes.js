@@ -1,16 +1,16 @@
 const router = require('express').Router()
-const userService = require('./user.http')
+const userController = require('./user.controller')
 
 const passportJwt = require('../middleware/auth.middleware')
 
-router.get('/', userService.getAll)
+router.get('/', userController.getAll)
 
-router.get('/me', passportJwt, userService.getMyUserById)
-router.patch('/me', passportJwt, userService.editMyuser)
-router.delete('/me', passportJwt, userService.removeMyUser)
+router.get('/me', passportJwt, userController.getMyUserById)
+router.patch('/me', passportJwt, userController.editMyuser)
+router.delete('/me', passportJwt, userController.removeMyUser)
 
-router.get('/:id', passportJwt, userService.getById)
-router.patch('/:id',passportJwt, userService.edit)
-router.delete('/:id',passportJwt, userService.remove)
+router.get('/:id', passportJwt, userController.getById)
+router.patch('/:id',passportJwt, userController.edit)
+router.delete('/:id',passportJwt, userController.remove)
 
 module.exports = {router}

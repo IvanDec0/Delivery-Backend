@@ -1,71 +1,195 @@
-const uuid = require('uuid');
-const { hashPassword } = require('../utils/crypt')
-const Users = require('../models/user.model')
+const userService= require('./user.service')
+const responses = require('../utils/handleResponses')
+const {hashPassword} = require('../utils/crypt')
 
-const getAllUsers = async () => {
-    const data = await Users.findAll({
-        attributes: {
-            exclude: ["password", "createdAt", "updatedAt"]
-        }
-    })
-    return data
-    //? Select * from users;
+const getAll = (req, res) => {
+    userService.getAllUsers()
+        .then(data => {
+            responses.success({
+                status: 200,
+                data: data,
+                message: 'Getting all Users',
+                res
+            })
+        })
+        .catch(err => {
+            responses.error({
+                status: 400,
+                data: err,
+                message: 'Something bad getting all users',
+                res
+            })
+            console.log(err);
+        })
 }
 
-const getUserById = async (id) => {
-    const data = await Users.findOne({
-        where: { id: id },
-        attributes: { exclude: ["password"] }
-    })
-    return data
-    //? select * from users where id = ${id};
+const getById = (req, res) => {
+    const id = req.params.id
+    userService.getUserById(id)
+        .then(data => {
+            if (data) {
+                responses.success({
+                    status: 200,
+                    data,
+                    message: `Getting User with id: ${id}`,
+                    res
+                })
+            } else {
+                responses.error({
+                    status: 404,
+                    message: `User with ID: ${id}, not found`,
+                    res
+                })
+            }
+        })
+        .catch(err => {
+            responses.error({
+                status: 400,
+                data: err,
+                message: 'Something bad getting the user',
+                res
+            })
+        })
 }
 
-const createUser = async (data) => {
-    const newUser = await Users.create({
-        id: uuid.v4(),
-        first_name: data.first_name,
-        last_name: data.last_name,
-        email: data.email,
-        password: hashPassword(data.password),
-        phone: data.phone
-    })
-    return newUser
+const edit = (req, res) => {
+    const id = req.params.id
+    const data = req.body
+    if (!Object.keys(data).length) { // si no existen los key, entro al error
+        return res.status(400).json({ message: 'Missing data' })
+    } else if (
+        !data.nombre ||
+        !data.apellido ||
+        !data.email ||
+        !data.telefono
+    ) {
+        return res.status(400).json({
+            message: 'All fields must be completed', fields: {
+                nombre: 'string',
+                apellido: 'string',
+                email: 'example@example.com',
+                telefono: 'string'
+            }
+        })
+    } else {
+        const response = userService.editUser(id, data)
+        return res.status(200).json({
+            message: 'User edited succesfully',
+            user: data
+        })
+    }
 }
 
-const editUser = async (userId, data) => {
-    const response = await Users.update(data, {
-        where: { id: userId }, attributes: {
-            exclude: ["password"]
-        }
-    })
-    return response
+const remove = (req, res) => {
+    const id = req.params.id
+
+    userService.deleteUser(id)
+        .then(data => {
+            if (data) {
+                responses.success({
+                    status: 200,
+                    data,
+                    message: `User with id: ${id} deleted successfully`,
+                    res
+                })
+            } else {
+                responses.error({
+                    status: 404,
+                    data: err,
+                    message: `The user with ID ${id} not found`,
+                    res
+                })
+            }
+        })
+        .catch(err => {
+            responses.error({
+                status: 400,
+                data: err,
+                message: `Error ocurred trying to delete user with id ${id}`,
+                res
+            })
+        })
 }
 
-const deleteUser = async (id) =>{
-    const data = await Users.destroy({
-        where: {
-            id: id
-        }
-    })
-    return data
+
+const getMyUserById = (req, res) => {
+    const id = req.user.id
+
+    userService.getUserById(id)
+        .then(data => {
+            responses.success({
+                res,
+                status: 200,
+                message: 'This is your current user',
+                data
+            })
+        })
+        .catch(err => {
+            responses.error({
+                res,
+                status: 400,
+                message: 'Something bad getting the current user',
+                data: err
+            })
+        })
 }
 
-const getUserByEmail = async (email) =>{
-    const data = await Users.findOne({
-        where: {
-            email: email
-        }
+const removeMyUser = (req, res) => {
+    const id = req.user.id
+    const data = userService.deleteUser(id)
+    if (data) {
+        return responses.success({
+            res,
+            status: 200,
+            message: `User deleted successfully with id: ${id}`,
+            data: data
+        })
+    }else{
+    return responses.error({
+        res,
+        status: 400,
+        message: 'Something bad trying to delete this user',
+        err
     })
-    return data
-    //? select * from users where email = ${email};
+}
+}
+
+const editMyuser = (req, res) => {
+    const userId = req.user.id
+    const { first_name, last_name, email, password, phone } = req.body
+
+    const data = {
+        first_name,
+        last_name,
+        email,
+        password: hashPassword(password),
+        phone
+    }
+    userService.editUser(userId, data)
+        .then(() => {
+            responses.success({
+                res,
+                status: 200,
+                message: 'Your user has been updated succesfully!',
+                data: data
+            })
+        })
+        .catch(err => {
+            responses.error({
+                res,
+                status: 400,
+                message: 'Something bad',
+                data: err
+            })
+        })
 }
 
 module.exports = {
-    getAllUsers,
-    getUserById,
-    getUserByEmail,
-    createUser,
-    editUser,
-    deleteUser
+    getAll,
+    getById,
+    edit,
+    remove,
+    getMyUserById,
+    editMyuser,
+    removeMyUser
 }
