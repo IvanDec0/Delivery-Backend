@@ -1,7 +1,7 @@
 const {DataTypes} = require('sequelize')
 const db  = require('../utils/database');
 
-const Categories = db.define('categories', {
+const Orders = db.define('orders', {
     id: {
         primaryKey: true,
         type: DataTypes.UUID,
@@ -11,6 +11,18 @@ const Categories = db.define('categories', {
         allowNull: false,
         type: DataTypes.STRING,
     },
+    orderStatus: {
+        type: DataTypes.STRING,
+        default: "Not Processed",
+        enum: [
+          "Not Processed",
+          "Cash on Delivery",
+          "Processing",
+          "Dispatched",
+          "Cancelled",
+          "Delivered",
+        ],
+      },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -23,15 +35,12 @@ const Categories = db.define('categories', {
     }
 })
 
-/* Categories.associate = (models) => {
-    Categories.hasMany(models.Products, {
-      foreignKey: {
-        name: 'categoryId',
-        allowNull: false
-      },
-      as: 'products'
+Orders.associate = (models) => {
+    Orders.User = Orders.belongsTo(models.Users, {
+      as: "orderby",
+      foreignKey: "userId",
     });
-  }; */
+}
 
 module.exports = 
-    Categories
+Orders
